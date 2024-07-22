@@ -1,5 +1,5 @@
 /* 
-Knucklebones is a two player dice game. You need at leat 17 dice to play. The objective of the game is to get more points than your oppnent. 
+Knucklebones is a two player dice game. You need at least 17 dice to play. The objective of the game is to get more points than your oppnent. 
 
 Each player is given 3 lanes that can hold up to 3 dice. Player take turns rolling dice and playing them on their board. If an opponents opposing lane holds a dice of the same value as the one you just played, the opponent removes the dice from their board. 
 
