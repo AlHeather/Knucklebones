@@ -6,24 +6,12 @@ import java.util.Scanner;
 public class Main {
 
     public static void main(String[] args) {
+        //Create the needed scanner
         Scanner scanner = new Scanner(System.in);
 
         //Create both players
         Player player1 = new Player();
         Player player2 = new Player();
-
-        //Testing how add roll works.
-
-        player1.addRoll(3, player2.getColumn1());
-        player2.addRoll(5, player2.getColumn2());
-        player2.addRoll(4, player2.getColumn2());
-        player2.addRoll(1, player2.getColumn3());
-        player1.addRoll(6, player2.getColumn1());
-        player1.addRoll(2, player2.getColumn1());
-
-
-        System.out.println(player1.getColumn1()[0]);
-
 
         //Start Game
         //Display lanes first
@@ -37,11 +25,12 @@ public class Main {
         //Loop Gameplay
 
         while (true) {
-            //Player 1 roll and lane select
             //Must generate roll first
             int generatedRoll = Turn.rollDice();
 
             //loop until valid lane.
+            //**ISSUE** IF PLAYER SELECTS A FULL LANE, THEY LOSE THEIR TURN INSTEAD-
+            //OF GETTING INVALID INPUT **ISSUE*
             while (true) {
                 System.out.println("Player 1 rolled: " + generatedRoll);
                 System.out.println("Pick a column 1-3 (left to right)");
@@ -116,8 +105,13 @@ public class Main {
             if(Turn.isGameOver(player2)){
                 break;
             }
-
         }
+
+        //Calculate and display score
+
+
+        //Find and display winner
+
 
     }
 }
