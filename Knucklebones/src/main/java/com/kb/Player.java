@@ -1,91 +1,104 @@
 package com.kb;
 
 public class Player {
-    //set columns to check dice against
-    private int[] column1 = new int[3];
-    private int[] column2 = new int[3];
-    private int[] column3 = new int [3];
+    private int[] lane1;
+    private int[] lane2;
+    private int[] lane3;
+    private int playerNumber;
+    private final int MAXLANESIZE = 3;
 
-    //Constants
-
-    //Make getters.. I don't think i need setters
-    public int[] getColumn1() {
-        return column1;
-    }
-
-    public int[] getColumn2() {
-        return column2;
-    }
-
-    public int[] getColumn3() {
-        return column3;
-    }
-
-    //Constructor. make everything 0
-    public Player(){
-        final int MAXCOLUMNSIZE = 3;
-        for(int i = 0; i < MAXCOLUMNSIZE; i++){
-            column1[i] = 0;
-            column2[i] = 0;
-            column3[i] = 0;
+    public Player(int playerNumber){
+        this.playerNumber = playerNumber;
+        lane1 = new int[MAXLANESIZE];
+        lane2 = new int[MAXLANESIZE];
+        lane3 = new int[MAXLANESIZE];
+        for(int i = 0; i < MAXLANESIZE; i++){
+            lane1[i] = 0;
+            lane2[i] = 0;
+            lane3[i] = 0;
         }
     }
 
-    //Check for number rolled in lane place. delete copies of that on the other player
-    public void deleteLane(int numberRolled, int[] columnUsed){
-        for(int i = 0; i < columnUsed.length; i++){
-            if(columnUsed[i] == numberRolled){
-                columnUsed[i] = 0;
+    public int[] getLane1(){
+        return lane1;
+    }
+    public int[] getLane2(){
+        return lane2;
+    }
+    public int[] getLane3(){
+        return lane3;
+    }
+
+
+    public String toString(){
+        String result = "Player " + playerNumber + ":\n";
+        for(int i = 0; i < MAXLANESIZE; i++){
+            result += "{ " + lane1[i] + " " + lane2[i] + " " + lane3[i] + " }\n";
+        }
+        return result;
+    }
+
+    public void removeDice(int lane, int numToDel){
+        if(lane == 1){
+            this.lane1 = delInLane(numToDel, this.lane1);
+            organizeLane(this.lane1);
+        }else if(lane == 2){
+            this.lane2 = delInLane(numToDel,this.lane2);
+            organizeLane(this.lane2);
+        }else{
+            this.lane3 = delInLane(numToDel,this.lane3);
+            organizeLane(this.lane3);
+        }
+    }
+
+    private int[] delInLane(int numToDel, int[] lane){
+        for(int i = 0; i < MAXLANESIZE; i++){
+            if(lane[i] == numToDel){
+                lane[i] = 0;
             }
         }
+        return lane;
     }
 
-    //put 0's in the back, move everything else forward.
-    public void organizeLanes(){
-        if((column1[0] == 0 && (column1[1] > 0 || column1[2] > 0))
-        || (column1[1] == 0 && column1[2] > 0)){
-            if(column1[0] == 0 ) {
-                column1[0] = column1[1];
-            }
-            column1[1] = column1[2];
-            column1[2] = 0;
+    private static void organizeLane(int[] lane){
+        if(lane[1] == 0){
+            lane[1] = lane[2];
+            lane[2] = 0;
         }
-        if((column2[0] == 0 && (column2[1] > 0 || column2[2] > 0))
-                || (column2[1] == 0 && column2[2] > 0)){
-            if(column2[0] == 0 ) {
-                column2[0] = column2[1];
-            }
-            column2[1] = column2[2];
-            column2[2] = 0;
+        if(lane[0] == 0){
+            lane[0] = lane[1];
+            lane[1] = lane[2];
+            lane[2] = 0;
         }
-        if((column3[0] == 0 && (column3[1] > 0 || column3[2] > 0))
-                || (column3[1] == 0 && column3[2] > 0)){
-            if(column3[0] == 0 ) {
-                column3[0] = column3[1];
+
+    }
+
+    public static boolean isLaneEmpty(int[] lane){
+        boolean isEmpty = false;
+        for(int x : lane){
+            if(x == 0){
+                isEmpty = true;
             }
-            column3[1] = column3[2];
-            column3[2] = 0;
+        }
+        return isEmpty;
+    }
+
+    public void addRoll(int laneNumber, int rolledNumber){
+        if(laneNumber == 1){
+            addRollToLane(this.lane1,rolledNumber);
+        }else if(laneNumber == 2){
+            addRollToLane(this.lane2,rolledNumber);
+        }else{
+            addRollToLane(this.lane3,rolledNumber);
         }
     }
 
-    //add roll to the first non 0
-    public void addRoll(int valueRolled, int[] columnSelected){
-        for(int i = 0; i < columnSelected.length; i++){
-            if(columnSelected[i] == 0){
-                columnSelected[i] = valueRolled;
+    private void addRollToLane(int[] lane, int rolledNumber){
+        for(int i = 0; i < MAXLANESIZE ; i++){
+            if(lane[i] == 0){
+                lane[i] = rolledNumber;
                 break;
             }
-        }
-    }
-
-    //Print Board state
-    public void printBoard(){
-        final int MAXCOLUMNSIZE = 3;
-        for(int i=0; i < MAXCOLUMNSIZE; i++){
-            int column1 = this.column1[i];
-            int column2 = this.column2[i];
-            int column3 = this.column3[i];
-            System.out.println(column1 + " | " + column2 + " | " + column3);
         }
     }
 

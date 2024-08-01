@@ -4,114 +4,115 @@ import java.sql.SQLOutput;
 import java.util.Scanner;
 
 public class Main {
+    //Use the same user input scanner for everything
+
+    //Create new Players
+    private Player player1 = new Player(1);
+    private Player player2 = new Player(2);
+    private Scanner userInput = new Scanner(System.in);
 
     public static void main(String[] args) {
-        //Create the needed scanner
-        Scanner scanner = new Scanner(System.in);
+        Main program = new Main();
+        program.run();
+    }
 
-        //Create both players
-        Player player1 = new Player();
-        Player player2 = new Player();
+    private void run(){
+        while(true){
+            printBoard();
 
-        //Start Game
-        //Display lanes first
-        System.out.println("Player 1:");
-        player1.printBoard();
-        System.out.println("");
-        System.out.println("Player 2:");
-        player2.printBoard();
+            int roll = Turn.getDiceRoll();
 
-
-        //Loop Gameplay
-
-        while (true) {
-            //Must generate roll first
-            int generatedRoll = Turn.rollDice();
-
-            //loop until valid lane.
-            //**ISSUE** IF PLAYER SELECTS A FULL LANE, THEY LOSE THEIR TURN INSTEAD-
-            //OF GETTING INVALID INPUT **ISSUE*
-            while (true) {
-                System.out.println("Player 1 rolled: " + generatedRoll);
-                System.out.println("Pick a column 1-3 (left to right)");
-                int lanePick = Integer.parseInt((scanner.nextLine()));
-                if (lanePick == 1) {
-                    player1.addRoll(generatedRoll, player1.getColumn1());
-                    player2.deleteLane(generatedRoll, player2.getColumn1());
-                    break;
-                } else if (lanePick == 2) {
-                    player1.addRoll(generatedRoll, player1.getColumn2());
-                    player2.deleteLane(generatedRoll, player2.getColumn2());
-                    break;
-                } else if (lanePick == 3) {
-                    player1.addRoll(generatedRoll, player1.getColumn3());
-                    player2.deleteLane(generatedRoll, player2.getColumn3());
-                    break;
-                } else {
-                    System.out.println("Invalid input");
+            System.out.printf("Player 1 rolled " + roll + " ");
+            boolean isLaneValid = false;
+            int lane = 0;
+            while(!isLaneValid){
+                lane = selectLane();
+                if(lane == 1){
+                    isLaneValid = Player.isLaneEmpty(player1.getLane1());
+                }else if(lane == 2){
+                    isLaneValid = Player.isLaneEmpty(player1.getLane2());
+                }else if (lane == 3){
+                    isLaneValid = Player.isLaneEmpty(player1.getLane3());
+                }
+                if(!isLaneValid){
+                    System.out.println("Enter a lane that has a '0'");
                 }
             }
 
-            //fix player2 lanes
-            player2.organizeLanes();
+            player1.addRoll(lane,roll);
+            player2.removeDice(lane,roll);
 
-            //Display board state
-            System.out.println("Player 1:");
-            player1.printBoard();
-            System.out.println("");
-            System.out.println("Player 2:");
-            player2.printBoard();
-
-            //Check if player 1 ended the game
-            if (Turn.isGameOver(player1)) {
+            if(Turn.isGameOver(player1)){
                 break;
             }
 
-            //generate player 2 roll
-            generatedRoll = Turn.rollDice();
+            printBoard();
 
-            while(true){
-                System.out.println("Player 2 rolled: " + generatedRoll);
-                System.out.println("Pick a column 1-3 (left to right)");
-                int lanePicked = Integer.parseInt(scanner.nextLine());
-                if(lanePicked==1){
-                    player2.addRoll(generatedRoll,player2.getColumn1());
-                    player1.deleteLane(generatedRoll,player1.getColumn1());
-                    break;
-                }else if(lanePicked==2){
-                    player2.addRoll(generatedRoll,player2.getColumn2());
-                    player1.deleteLane(generatedRoll,player1.getColumn2());
-                    break;
-                }else if(lanePicked==3){
-                    player2.addRoll(generatedRoll,player2.getColumn3());
-                    player1.deleteLane(generatedRoll,player1.getColumn3());
-                    break;
-                }else{
-                    System.out.println("invalid input");
+            roll = Turn.getDiceRoll();
+
+
+            System.out.printf("Player 2 rolled " + roll + " ");
+            isLaneValid = false;
+            lane = 0;
+            while(!isLaneValid) {
+                lane = selectLane();
+                if(lane == 1){
+                    isLaneValid = Player.isLaneEmpty(player2.getLane1());
+                }else if(lane == 2){
+                    isLaneValid = Player.isLaneEmpty(player2.getLane2());
+                }else if(lane == 3){
+                    isLaneValid = Player.isLaneEmpty(player2.getLane3());
+                }
+                if(!isLaneValid){
+                    System.out.println("enter a lane with a '0'");
                 }
             }
 
-            //clean up player 1 lanes
-            player1.organizeLanes();
+            player2.addRoll(lane,roll);
+            player1.removeDice(lane,roll);
 
-            //Display board state
-            System.out.println("Player 1:");
-            player1.printBoard();
-            System.out.println("");
-            System.out.println("Player 2:");
-            player2.printBoard();
-
-            //check if player 2 ended the game
             if(Turn.isGameOver(player2)){
                 break;
             }
         }
 
-        //Calculate and display score
+        System.out.println("FINAL BOARD:");
+        printBoard();
 
+        int player1Score = Turn.getScore(player1);
+        int player2Score = Turn.getScore(player2);
 
-        //Find and display winner
+        System.out.println("Player 1 " + player1Score + " points");
+        System.out.println("Player 2 " + player2Score + " points");
 
+        if(player1Score < player2Score){
+            System.out.println("Player 1 wins!");
+        }else{
+            System.out.println("Player 2 wins!");
+        }
+    }
 
+    private void printBoard(){
+        System.out.println(player1);
+        System.out.println(player2);
+    }
+
+    private int selectLane(){
+        boolean isValidNumber = false;
+        int result = 0;
+        while(!isValidNumber) {
+            System.out.println("enter lane to place dice (1-3, left to right)");
+            String strInt = userInput.nextLine();
+            try{
+                int parsedInt = Integer.parseInt(strInt);
+                if(parsedInt <= 3 && parsedInt > 0 ){
+                    result = parsedInt;
+                    isValidNumber = true;
+                }
+            }catch(NumberFormatException e){
+                System.out.println("Give number as a digit");
+            }
+        }
+        return result;
     }
 }

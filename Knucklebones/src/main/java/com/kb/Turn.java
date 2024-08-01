@@ -1,54 +1,78 @@
 package com.kb;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
+import java.util.Scanner;
 
-public class Turn {
+public abstract class Turn {
 
+    public static int getDiceRoll() {
+        Random dice = new Random();
+        int x = dice.nextInt(6);
+        return x + 1;
+    }
 
+    public static int getScore(Player player) {
+        Map<Integer, Integer> lane1ScoreMap = getScoreMap(player.getLane1());
+        Map<Integer, Integer> lane2ScoreMap = getScoreMap(player.getLane2());
+        Map<Integer, Integer> lane3ScoreMap = getScoreMap(player.getLane3());
 
-        //Have Turn.rollDice give a random int between 0 and 6;
-        public static int rollDice(){
-            Random d6 = new Random();
-            final int topBoundInclusive = 6;
-            int result = d6.nextInt(topBoundInclusive);
-            return result+1;
-        }
+        int scoreLane1 = calculateFromMap(lane1ScoreMap);
+        int scoreLane2 = calculateFromMap(lane2ScoreMap);
+        int scoreLane3 = calculateFromMap(lane3ScoreMap);
 
+        int score = scoreLane1 + scoreLane2 + scoreLane3;
+        return score;
+    }
 
+    private static Map<Integer, Integer> getScoreMap(int[] lane) {
+        Map<Integer, Integer> scoreMap = new HashMap<>();
 
-        //If a single player has all 3 rows filled.
-        //return true and end the game
-        public static boolean isGameOver(Player player){
-            final int MAXCOLUMNLENGTH = 3;
-            int rowFilledCounter = 0;
-            final int ROWSTOFILL = 3;
-
-            for(int i = 0; i < MAXCOLUMNLENGTH; i++){
-                //grab all values in a row
-                int column1 = player.getColumn1()[i];
-                int column2 = player.getColumn2()[i];
-                int column3 = player.getColumn3()[i];
-                //if none are 0 add to row counter
-                if(column1 != 0 && column2 != 0 && column3 != 0){
-                    rowFilledCounter++;
-                }
+        for (int x : lane) {
+            if (scoreMap.containsKey(x)) {
+                scoreMap.put(x, scoreMap.get(x) + 1);
+            } else {
+                scoreMap.put(x, 1);
             }
-            //if row counter is maxed out. return true
-            if(rowFilledCounter == ROWSTOFILL){
-                return true;
+        }
+        return scoreMap;
+    }
+
+    private static int calculateFromMap(Map<Integer, Integer> map) {
+        int score = 0;
+        for (int x : map.keySet()) {
+            int base = 0;
+            for (int i = 0; i < map.get(x); i++) {
+                base += x;
             }
-            //else false
-            return false;
+            score += base * map.get(x);
         }
-
-        //Build score
-        //if a number appears twice, value * 4
-        //if it appears three times, value * 9
-        //else score = value
-        public static int scoreBuilder(Player player){
+        return score;
+    }
 
 
-            return 0;
+    public static boolean isGameOver(Player player) {
+        boolean isGameOver = false;
+        boolean isLaneOneFull = isLaneFull(player.getLane1());
+        boolean isLaneTwoFull = isLaneFull(player.getLane2());
+        boolean isLaneThreeFull = isLaneFull(player.getLane3());
+
+        if (isLaneOneFull && isLaneTwoFull && isLaneThreeFull) {
+            isGameOver = true;
         }
+        return isGameOver;
+    }
+
+    private static boolean isLaneFull(int[] lane){
+        boolean isFull = true;
+        for(int x : lane){
+            if(x == 0){
+                isFull = false;
+            }
+        }
+        return isFull;
+    }
+
 
 }
